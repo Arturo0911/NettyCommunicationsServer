@@ -7,37 +7,30 @@ import java.util.regex.Pattern;
 public class CommandHandler {
 
 
+    /**
+     *
+     * @param msg the first message from the coban
+     * @return the imei or null
+     */
     public String decode(String msg) {
         Matcher matcher = null;
         matcher = Pattern.compile("imei:(\\d+),").matcher(msg);
         if (matcher.find()){
             return matcher.group(1);
         }
-
-        matcher = Pattern.compile("(.*);").matcher(msg);
-        if (matcher.find()){
-            System.out.println("matcher0 " +matcher.group(0));
-            System.out.println("matcher1 " +matcher.group(1));
-            return matcher.group(1);
-        }
-        return "nothing";
+        return null;
     }
 
 
     public void checkStatusCoban(ChannelHandlerContext ctx, String message){
-        Object uniqueId = decode(message);
-        System.out.println("imei => "+uniqueId);
+        //Object uniqueId = decode(message);
         if(message.contains("imei:") && message.length() <= 30){
             ctx.channel().writeAndFlush("LOAD");
-
-            System.out.println("LOGIN");
+            //System.out.println("LOGIN");
         }
 
         if(!message.isEmpty() && Character.isDigit(message.charAt(0))){
             ctx.channel().writeAndFlush("ON");
-            System.out.println(message.charAt(0));
-
-            System.out.println("Checking live connection from the coban");
         }
     }
 
@@ -74,7 +67,7 @@ public class CommandHandler {
     }
 
     public String formatCommand(String keyData, String uniqueId){
-        return "**,imei:"+uniqueId+","+keyData;
+        return "**,imei:"+uniqueId+","+keyData+";";
     }
 
     public String  encodeCommand(String commandType, String uniqueId){
